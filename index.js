@@ -72,10 +72,13 @@ app.post('/api/users', (req, res) => {
 
 // put req by id
 app.put('/app/users/:id', (req, res) => {
-  const {id} = req.params;
-  const changeUser = req.body;
+  const id = req.params.id;
+  const updateUser = {
+    name: req.body.name,
+    bio: req.body.bio
+  };
 
-  if (!changeUser.name || !changeUser.bio) {
+  if (!updateUser.name || !updateUser.bio) {
     return res.status(400).json({
       errorMessage: 'Please provide name and bio for the user.'
     })
@@ -84,7 +87,7 @@ app.put('/app/users/:id', (req, res) => {
       errorMessage: 'The user with the specified ID does not exist.'
     })
   } else {
-    db.update(id, changeUser)
+    db.update(id, updateUser)
       .then(res => {
         res.status(200).json(res)
       })
