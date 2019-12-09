@@ -49,12 +49,13 @@ app.get('/api/users/:id', (req, res) => {
   })
 })
 
+// post req for new user
 app.post('/api/users', (req, res) => {
   const newUser = req.body;
 
   if (!newUser.name || !newUser.bio) {
-    return res.status(400).json({ 
-      errorMessage: 'Please provide name and bio for the user.' 
+    return res.status(400).json({
+      errorMessage: 'Please provide name and bio for the user.'
     })
   } else {
     db.insert(newUser)
@@ -62,35 +63,62 @@ app.post('/api/users', (req, res) => {
         res.status(201).json(res)
       })
       .catch(error => {
-        res.status(500).json({ 
-          errorMessage: 'There was an error while saving the user to the database' 
+        res.status(500).json({
+          errorMessage: 'There was an error while saving the user to the database'
         })
       })
-    }
+  }
+}) 
+
+// put req by id
+app.put('/app/users/:id', (req, res) => {
+  const {id} = req.params;
+  const changeUser = req.body;
+
+  if (!changeUser.name || !changeUser.bio) {
+    return res.status(400).json({
+      errorMessage: 'Please provide name and bio for the user.'
+    })
+  } else if (!id) {
+    return res.status(404).json({
+      errorMessage: 'The user with the specified ID does not exist.'
+    })
+  } else {
+    db.update(id, changeUser)
+      .then(res => {
+        res.status(200).json(res)
+      })
+    .catch(error => {
+      res.status(500).json({
+        errorMessage: 'The user information could not be modified.'
+      })
+    })
+  }
 })
 
+// delete req by id
 app.delete('/api/users/:id', (req, res) => {
-  const user = req.params.id;
-  if (user) {
-    db.remove(user)
+  // const user = req.params;
+    db.remove(req.params.id)
       .then(rm => {
-        res.status(200).json(rm)
-      })
-    } else {
-      res.status(404).json({
-        errorMessage: 'The user with the specified ID does not exist'
+        if (rm) {
+          res.status(200).json(rm)
+        } else {
+          res.status(404).json({
+            errorMessage: 'The user with the specified ID does not exist'
+          })
+        }
       })
       .catch(error => {
         res.status(500).json({
           errorMessage: 'The user could not be removed'
         })
       })
-  }
 })
 
 const hostname = '127.0.0.1';
 const port = 3000;
 
 app.listen(port, hostname, () => {
-  console.log(`Server running http://${hostname}:${port}/api`)
+  console.log(`Server running http://${hostname}:${port}/`)
 })
