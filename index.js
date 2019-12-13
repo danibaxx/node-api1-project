@@ -72,31 +72,34 @@ app.post('/api/users', (req, res) => {
 
 // put req by id
 app.put('/api/users/:id', (req, res) => {
-  const { id } = req.params.id;
+  const id = req.params.id;
   const updateUser = {
-    name: req.body,
-    bio: req.body
+    name: req.body.name,
+    bio: req.body.bio
   };
 
-  if (!updateUser.name || !updateUser.bio) {
-    return res.status(400).json({
-      errorMessage: 'Please provide name and bio for the user.'
+  db.findById(id)
+    .then(data => {
+      if (!data) {
+        return res.status(404).json({
+          message: 'The user with the specified ID does not exist.'
+        })
+      } else if (!req.body.name || !req.body.bio) {
+        return res.status(400).json({
+          errorMessage: 'Please provide name and bio for the user.'
+        })
+      } else {
+        db.update(id, updateUser)
+        .then(data => {
+          res.status(200).json(data)
+        })
+        .catch(error => {
+          res.status(500).json({
+            errorMessage: 'The user information could not be modified.'
+          })
+        })
+      }
     })
-  } else if (!id) {
-     res.status(404).json({
-      message: 'The user with the specified ID does not exist.'
-    })
-  } else {
-    db.update(id, updateUser)
-      .then(data => {
-        res.status(200).json(data)
-      })
-    .catch(error => {
-      res.status(500).json({
-        errorMessage: 'The user information could not be modified.'
-      })
-    })
-  }
 })
 
 // delete req by id
