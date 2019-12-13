@@ -54,13 +54,13 @@ app.post('/api/users', (req, res) => {
   const newUser = req.body;
 
   if (!newUser.name || !newUser.bio) {
-    return res.status(400).json({
+     res.status(400).json({
       errorMessage: 'Please provide name and bio for the user.'
     })
   } else {
     db.insert(newUser)
-      .then(res => {
-        res.status(201).json(res)
+      .then(data => {
+        res.status(201).json(data)
       })
       .catch(error => {
         res.status(500).json({
@@ -71,11 +71,11 @@ app.post('/api/users', (req, res) => {
 }) 
 
 // put req by id
-app.put('/app/users/:id', (req, res) => {
-  const id = req.params.id;
+app.put('/api/users/:id', (req, res) => {
+  const { id } = req.params.id;
   const updateUser = {
-    name: req.body.name,
-    bio: req.body.bio
+    name: req.body,
+    bio: req.body
   };
 
   if (!updateUser.name || !updateUser.bio) {
@@ -83,13 +83,13 @@ app.put('/app/users/:id', (req, res) => {
       errorMessage: 'Please provide name and bio for the user.'
     })
   } else if (!id) {
-    return res.status(404).json({
-      errorMessage: 'The user with the specified ID does not exist.'
+     res.status(404).json({
+      message: 'The user with the specified ID does not exist.'
     })
   } else {
     db.update(id, updateUser)
-      .then(res => {
-        res.status(200).json(res)
+      .then(data => {
+        res.status(200).json(data)
       })
     .catch(error => {
       res.status(500).json({
@@ -119,7 +119,7 @@ app.delete('/api/users/:id', (req, res) => {
       })
 })
 
-const host = process.env.HOST || '0.0.0.0';
+const host = process.env.HOST || 'localhost';
 const port = process.env.PORT || 3000;
 
 app.listen(port, host, () => {
